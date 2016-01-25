@@ -6,3 +6,7 @@
 ## Installation
 
     $ sudo python setup.py install
+
+## Usage
+
+    $ from formosa import *
