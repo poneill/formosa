@@ -6,6 +6,7 @@
 ## Installation
 
     $ sudo python setup.py install
+    $ nosetests
 
 ## Usage
 
