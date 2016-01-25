@@ -3,6 +3,6 @@
 
 **formosa** is a Python library for sampling nucleic acid motifs by information content.
 
-## installation
+## Installation
 
     $ sudo python setup.py install
