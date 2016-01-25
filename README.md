@@ -6,6 +6,9 @@
 ## Installation
 
     $ sudo python setup.py install
+
+After installation, you should run the unit tests:
+
     $ nosetests
 
 ## Usage
