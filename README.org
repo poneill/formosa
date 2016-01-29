@@ -1,10 +1,9 @@
 #+TITLE: formosa
 
-**FOR** **MO**tif **SA**mpling
+=formosa= is *FOR* *MO*tif *SA*mpling, a Python library for sampling
+nucleic acid motifs by information content.
 
-**formosa** is a Python library for sampling nucleic acid motifs by information content.
-
-## Installation
+** Installation
 
     $ sudo python setup.py install
 
@@ -12,6 +11,14 @@ After installation, you should run the unit tests:
 
     $ nosetests
 
-## Usage
+** Usage
 
-    $ from formosa import *
+*** Command line
+Run:
+    $ python formosa.py -h 
+for example usage.
+
+*** In Python scripts
+In the imports section of your script, type:
+     
+    from formosa import *
