@@ -1,8 +1,7 @@
 #+TITLE: formosa
 
 =formosa= is a Python library to facilitate sampling nucleic acid
-motifs by information content.  =formosa= is *FOR* *MO* tif *SA*
-mpling.
+motifs by information content.  =formosa= is FOR MOtif SAmpling.
 
 ** Installation
 
@@ -23,3 +22,5 @@ for example usage.
 In the imports section of your script, type:
      
 : from formosa import *
+
+See =using_formosa.ipynb= for a tutorial on using =formosa=.
