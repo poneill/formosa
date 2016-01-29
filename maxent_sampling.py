@@ -39,15 +39,15 @@ def spoof_maxent_motifs(motif,num_motifs,verbose=False):
         print "n: {} L: {} des_ic: {}".format(n,L,des_ic)
     return maxent_motifs(n,L,des_ic,num_motifs,verbose=verbose)
 
-def maxent_motifs(n, L, desired_ic, num_motifs, tolerance=10**-10,beta=None,verbose=False):
+def maxent_motifs(N, L, desired_ic, num_motifs, tolerance=10**-10,beta=None,verbose=False):
     if beta is None:
-        correction_per_col = 3/(2*log(2)*n)
+        correction_per_col = 3/(2*log(2)*N)
         desired_ic += L * correction_per_col
-        beta = find_beta_for_mean_motif_ic(n,L,desired_ic,tolerance=tolerance,verbose=verbose)
+        beta = find_beta_for_mean_motif_ic(N,L,desired_ic,tolerance=tolerance,verbose=verbose)
         if verbose:
             print "beta:",beta
-    ps = count_ps_from_beta(n,beta)
-    count_sampler = inverse_cdf_sampler(enumerate_counts(n),ps)
+    ps = count_ps_from_beta(N,beta)
+    count_sampler = inverse_cdf_sampler(enumerate_counts(N),ps)
     def sample():
         counts = [count_sampler() for i in range(L)]
         cols = [sample_col_from_count(count) for count in counts]
