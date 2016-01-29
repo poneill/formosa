@@ -1,7 +1,8 @@
 #+TITLE: formosa
 
-=formosa= is *FOR* *MO* tif *SA* mpling. a Python library for sampling
-nucleic acid motifs by information content.
+=formosa= is a Python library to facilitate sampling nucleic acid
+motifs by information content.  =formosa= is *FOR* *MO* tif *SA*
+mpling.
 
 ** Installation
 
