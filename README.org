@@ -6,20 +6,20 @@ mpling.
 
 ** Installation
 
-    $ sudo python setup.py install
+: $ sudo python setup.py install
 
 After installation, you should run the unit tests:
 
-    $ nosetests
+: $ nosetests
 
 ** Usage
 
 *** Command line
 Run:
-    $ python formosa.py -h 
+: $ python formosa.py -h 
 for example usage.
 
 *** In Python scripts
 In the imports section of your script, type:
      
-    from formosa import *
+: from formosa import *
