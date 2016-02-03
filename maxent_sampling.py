@@ -76,11 +76,14 @@ def find_beta_for_mean_col_ic(n, desired_ic_per_col,tolerance=10**-10,verbose=Fa
         log_phats = np_log_normalize(log_cols + -beta*entropies)
         expected_entropy = np.exp(log_phats).dot(entropies)
         return 2 - expected_entropy - desired_ic_per_col
+    lb = -1
+    while f2(lb) > 0:
+        lb *= 2
     ub = 1000
     while f2(ub) < 0:
         ub *= 2
         print "raising upper bound to:",ub
-    return secant_interval(f2,0,ub,verbose=verbose,tolerance=tolerance)
+    return secant_interval(f2,lb,ub,verbose=verbose,tolerance=tolerance)
 
 def enumerate_counts(N):
     return list(partitionfunc(N,4,l=0))
