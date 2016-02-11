@@ -29,7 +29,9 @@ def secant_interval(f,xmin,xmax,ymin=None,ymax=None,tolerance=1e-10,verbose=Fals
         ymin = f(xmin)
     if ymax is None:
         ymax = f(xmax)
-    for iteration in xrange(1000):
+    #for iteration in xrange(1000):
+    y = 1000000
+    while abs(y) > tolerance:
         if verbose:
             print xmin,xmax,ymin,ymax
         assert(np.sign(ymin)!= np.sign(ymax)), "ymin=%s,ymax=%s" % (ymin,ymax)
@@ -149,3 +151,57 @@ def sample_until(p,sampler,n,progress_bar=True):
 
 def inrange(M,I,epsilon):
     return abs(motif_ic(M)-I) < epsilon
+
+def motif_mi(motif):
+    cols = transpose(motif)
+    return sum([mi(col1,col2) for (col1,col2) in choose2(cols)])
+
+def mi(xs,ys,correct=True):
+    """Compute mutual information (in bits) of samples from two
+    categorical probability distributions"""
+    hx  = entropy(xs,correct=correct,alphabet_size=4)
+    hy  = entropy(ys,correct=correct,alphabet_size=4)
+    hxy = entropy(zip(xs,ys),correct=correct,alphabet_size=16)
+    return hx + hy - hxy
+
+def mi2(xs,ys, pc=1):
+    assert len(xs) == len(ys)
+    xys = zip(xs,ys)
+    N = float(len(xs))
+    px = lambda b:(xs.count(b) + pc)/(N + pc*4)
+    py = lambda b:(ys.count(b) + pc)/(N + pc*4)
+    pxy = lambda x,y:(xys.count((x,y)) + pc)/(N + pc * 16)
+    return sum(pxy(b1,b2)*log2(pxy(b1,b2)/(px(b1)*py(b2))) if pxy(b1,b2) else 0
+               for b1 in "ACGT" for b2 in "ACGT")
+
+def mi3(xs,ys, pc=1):
+    assert len(xs) == len(ys)
+    xys = zip(xs,ys)
+    N = float(len(xs))
+    px = lambda b:(xs.count(b) + 4*pc)/(N + 16*pc)
+    py = lambda b:(ys.count(b) + 4*pc)/(N + 16*pc)
+    pxy = lambda x,y:(xys.count((x,y)) + pc)/(N + 16*pc)
+    return sum(pxy(b1,b2)*log2(pxy(b1,b2)/(px(b1)*py(b2))) if pxy(b1,b2) else 0
+               for b1 in "ACGT" for b2 in "ACGT")
+
+def mi_test_cols(xs, ys, alpha=0.05, trials=1000, perm_test=True):
+    """using permutation test, do (1-sided) significance test for MI.  If
+    permute, compare to random permutation, otherwise random site"""
+    N = len(xs)
+    obs_mi = mi(xs,ys)
+    nullx = lambda : permute(xs) if perm_test else random_site(N)
+    nully = lambda : permute(ys) if perm_test else random_site(N)
+    perm_replicates = (mi(nullx(),nully()) for i in xrange(trials))
+    perc = len(filter(lambda x:x >= obs_mi,perm_replicates))/float(trials)
+    return perc < alpha
+
+def count(p,xs):
+    """Count number of xs satisfying p"""
+    return len(filter(p,xs))
+
+def choose2(xs, gen=False):
+    """return list of choose(xs, 2) pairs, retaining ordering on xs"""
+    if gen:
+        return ((x1, x2) for i, x1 in enumerate(xs) for x2 in xs[i+1:])
+    else:
+        return [(x1, x2) for i, x1 in enumerate(xs) for x2 in xs[i+1:]]
