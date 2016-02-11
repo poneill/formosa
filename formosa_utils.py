@@ -158,31 +158,13 @@ def motif_mi(motif):
 
 def mi(xs,ys,correct=True):
     """Compute mutual information (in bits) of samples from two
-    categorical probability distributions"""
+    categorical probability distributions, using small sample size
+    correction for each entropy computation.
+    """
     hx  = entropy(xs,correct=correct,alphabet_size=4)
     hy  = entropy(ys,correct=correct,alphabet_size=4)
     hxy = entropy(zip(xs,ys),correct=correct,alphabet_size=16)
     return hx + hy - hxy
-
-def mi2(xs,ys, pc=1):
-    assert len(xs) == len(ys)
-    xys = zip(xs,ys)
-    N = float(len(xs))
-    px = lambda b:(xs.count(b) + pc)/(N + pc*4)
-    py = lambda b:(ys.count(b) + pc)/(N + pc*4)
-    pxy = lambda x,y:(xys.count((x,y)) + pc)/(N + pc * 16)
-    return sum(pxy(b1,b2)*log2(pxy(b1,b2)/(px(b1)*py(b2))) if pxy(b1,b2) else 0
-               for b1 in "ACGT" for b2 in "ACGT")
-
-def mi3(xs,ys, pc=1):
-    assert len(xs) == len(ys)
-    xys = zip(xs,ys)
-    N = float(len(xs))
-    px = lambda b:(xs.count(b) + 4*pc)/(N + 16*pc)
-    py = lambda b:(ys.count(b) + 4*pc)/(N + 16*pc)
-    pxy = lambda x,y:(xys.count((x,y)) + pc)/(N + 16*pc)
-    return sum(pxy(b1,b2)*log2(pxy(b1,b2)/(px(b1)*py(b2))) if pxy(b1,b2) else 0
-               for b1 in "ACGT" for b2 in "ACGT")
 
 def mi_test_cols(xs, ys, alpha=0.05, trials=1000, perm_test=True):
     """using permutation test, do (1-sided) significance test for MI.  If
