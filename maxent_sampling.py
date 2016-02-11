@@ -52,7 +52,8 @@ def maxent_motifs(N, L, desired_ic, num_motifs, tolerance=10**-10,beta=None,verb
         counts = [count_sampler() for i in range(L)]
         cols = [sample_col_from_count(count) for count in counts]
         return map(lambda site:"".join(site),transpose(cols))
-    return [sample() for _ in trange(num_motifs)]
+    iterator = trange if verbose else xrange
+    return [sample() for _ in iterator(num_motifs)]
     
 def find_beta_for_mean_motif_ic(n,L,desired_ic,tolerance=10**-10,verbose=False):
     desired_ic_per_col = desired_ic/L
@@ -79,6 +80,9 @@ def find_beta_for_mean_col_ic(n, desired_ic_per_col,tolerance=10**-10,verbose=Fa
     lb = -1
     while f2(lb) > 0:
         lb *= 2
+        if lb < -1000:
+            print "Warning, failed to find lower bound on beta"
+            raise Exception("Couldn't find beta'")
     ub = 1000
     while f2(ub) < 0:
         ub *= 2
@@ -104,9 +108,10 @@ def partitionfunc(n,k,l=1):
         for result in partitionfunc(n-i,k-1,i):
             yield (i,)+result
 
-def count_ps_from_beta(n,beta,verbose=True):
+def count_ps_from_beta(n,beta,verbose=False):
+    iterator = tqdm if verbose else lambda x:x
     log_ws = np.array([log_counts_to_cols(count) + (-beta*entropy_from_counts(count))
-              for count in tqdm(enumerate_counts_iter(n))])
+              for count in iterator(enumerate_counts_iter(n))])
     return np.exp(np_log_normalize(log_ws))
 
 def entropy_from_counts(counts):
