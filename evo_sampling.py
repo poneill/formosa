@@ -21,8 +21,6 @@ def sample_site_cftp(matrix, mu, Ne):
         ep = f(s)
         nu = Ne - 1
         return -nu*log(1 + exp(ep - mu))
-    first_site = "A"*L
-    last_site = "T"*L
     best_site = "".join(["ACGT"[argmin(row)] for row in matrix])
     worst_site = "".join(["ACGT"[argmax(row)] for row in matrix])
     #middle_sites  = [[random_site(L)] for i in range(10)]
@@ -40,6 +38,7 @@ def sample_site_cftp(matrix, mu, Ne):
           for i in range(iterations)]
     converged = False
     while not converged:
+        trajs = [[best_site],[worst_site]] # added Wed Mar 30 15:26:03 EDT 2016
         for ri, rdir, r in rs:
             for traj in trajs:
                 x = traj[-1]
@@ -56,6 +55,7 @@ def sample_site_cftp(matrix, mu, Ne):
     assert all(map(lambda traj:traj[-1] == trajs[0][-1],trajs))
     return trajs[0][-1]
     #return trajs
+
 
 def spoof_motif_cftp(motif, num_motifs=10, trials=1, sigma=None,Ne_tol=10**-2,verbose=False):
     n = len(motif)
