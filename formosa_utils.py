@@ -80,25 +80,25 @@ def permute(xs):
 def transpose(xxs):
     return zip(*xxs)
 
-def motif_ic(motif,correct=True,alphabet_size=4):
+def motif_ic(motif,correct=True,A=4):
     """Return the entropy of a motif, assuming independence and a
     uniform genomic background"""
     site_length = len(motif[0])
-    return (log2(alphabet_size) * site_length -
-            motif_entropy(motif,correct=correct,alphabet_size=4))
+    return (log2(A) * site_length -
+            motif_entropy(motif,correct=correct,A=4))
 
-def motif_entropy(motif,correct=True,alphabet_size=4):
+def motif_entropy(motif,correct=True,A=4):
     """Return the entropy of a motif, assuming independence"""
-    return sum(map(lambda col:entropy(col,correct=correct,alphabet_size=alphabet_size),
+    return sum(map(lambda col:entropy(col,correct=correct,A=A),
                    transpose(motif)))
 
-def entropy(xs,correct=True,alphabet_size=None):
+def entropy(xs,correct=True,A=None):
     """compute entropy (in bits) of a sample from a categorical
     probability distribution"""
-    if alphabet_size == None:
-        alphabet_size = len(set(xs)) # NB: assuming every element appears!
+    if A == None:
+        A = len(set(xs)) # NB: assuming every element appears!
     ps = frequencies(xs)
-    correction = ((alphabet_size - 1)/(2*log(2)*len(xs)) if correct
+    correction = ((A - 1)/(2*log(2)*len(xs)) if correct
                   else 0) #Basharin 1959
     #print "correction:",correction
     return h(ps) + correction
@@ -153,18 +153,18 @@ def sample_until(p,sampler,n,progress_bar=True):
 def inrange(M,I,epsilon):
     return abs(motif_ic(M)-I) < epsilon
 
-def motif_mi(motif, correct=False):
+def motif_mi(motif, correct=False, A=A):
     cols = transpose(motif)
-    return sum([mi(col1,col2, correct=correct) for (col1,col2) in choose2(cols)])
+    return sum([mi(col1,col2, correct=correct, A=A) for (col1,col2) in choose2(cols)])
 
-def mi(xs,ys,correct=True):
+def mi(xs,ys,correct=True,A=4):
     """Compute mutual information (in bits) of samples from two
     categorical probability distributions, using small sample size
     correction for each entropy computation.
     """
-    hx  = entropy(xs,correct=correct,alphabet_size=4)
-    hy  = entropy(ys,correct=correct,alphabet_size=4)
-    hxy = entropy(zip(xs,ys),correct=correct,alphabet_size=16)
+    hx  = entropy(xs,correct=correct,A=A)
+    hy  = entropy(ys,correct=correct,A=A)
+    hxy = entropy(zip(xs,ys),correct=correct,A=A**2)
     return hx + hy - hxy
 
 def mi_test_cols(xs, ys, alpha=None, trials=1000):
@@ -258,26 +258,26 @@ def pssm_from_motif(motif, pc=1):
     psfm = psfm_from_motif(motif, pc)
     return [[log(f/0.25,2) for f in row] for row in psfm]
 
-def psfm_from_motif(motif,pc=1):
+def psfm_from_motif(motif,pc=1, A=4):
     n = float(len(motif))
     cols = transpose(motif)
-    return [[(col.count(b) + pc)/(n+4*pc) for b in "ACGT"] for col in cols]
+    return [[(col.count(b) + pc)/(n+A*pc) for b in "ACGT"] for col in cols]
 
 def normalize(xs):
     total = float(sum(xs))
     return [x/total for x in xs]
 
-def sample_matrix(L,sigma):
-    return [[random.gauss(0,sigma) for j in range(4)] for i in range(L)]
+def sample_matrix(L,sigma, A=4):
+    return [[random.gauss(0,sigma) for j in range(A)] for i in range(L)]
 
 def approx_mu(matrix, copies, G=5*10**6):
     Zb = Zb_from_matrix(matrix, G)
     return log(copies) - log(Zb)
 
-def Zb_from_matrix(matrix,G):
+def Zb_from_matrix(matrix,G, A=4):
     """calculate partition function"""
     L = len(matrix)
-    Zb_hat = prod(sum(exp(-ep) for ep in col) for col in matrix)/(4**L)
+    Zb_hat = prod(sum(exp(-ep) for ep in col) for col in matrix)/(A**L)
     return G * Zb_hat
 
 def prod(xs):
@@ -298,10 +298,10 @@ def occupancies(motif, copy_factor=10, G=5*10**6):
     eps = [score_seq(matrix, site) for site in motif]
     return [1/(1+exp(ep-mu)) for ep in eps]
         
-def matrix_from_motif(seqs,pc=1):
+def matrix_from_motif(seqs, pc=1, A=4):
     cols = transpose(seqs)
     N = float(len(seqs))
-    raw_mat = [[-log((col.count(b)+pc)/(N+4*pc)) for b in "ACGT"] for col in cols]
+    raw_mat = [[-log((col.count(b)+pc)/(N+A*pc)) for b in "ACGT"] for col in cols]
     # now normalize each column by the average value
     avg = mean(map(mean,raw_mat))
     return [[x-avg for x in row] for row in raw_mat]
