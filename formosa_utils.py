@@ -153,7 +153,7 @@ def sample_until(p,sampler,n,progress_bar=True):
 def inrange(M,I,epsilon):
     return abs(motif_ic(M)-I) < epsilon
 
-def motif_mi(motif, correct=False, A=A):
+def motif_mi(motif, correct=False, A=4):
     cols = transpose(motif)
     return sum([mi(col1,col2, correct=correct, A=A) for (col1,col2) in choose2(cols)])
 
