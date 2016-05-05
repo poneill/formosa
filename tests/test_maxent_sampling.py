@@ -1,7 +1,7 @@
 from maxent_sampling import *
+from formosa_utils import mean_ci
 
 def test_maxent_motif():
-    from formosa_utils import mean_ci
     trials = 1000
     N, L, desired_ic = 10,10,10
     motifs = [maxent_motif(N,L,desired_ic) for i in trange(trials)]
