@@ -83,9 +83,8 @@ def transpose(xxs):
 def motif_ic(motif,correct=True,A=4):
     """Return the entropy of a motif, assuming independence and a
     uniform genomic background"""
-    site_length = len(motif[0])
-    return (log2(A) * site_length -
-            motif_entropy(motif,correct=correct,A=4))
+    L = len(motif[0])
+    return (log2(A) * L - motif_entropy(motif,correct=correct,A=A))
 
 def motif_entropy(motif,correct=True,A=4):
     """Return the entropy of a motif, assuming independence"""
