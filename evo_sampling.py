@@ -56,6 +56,90 @@ def sample_site_cftp(matrix, mu, Ne):
     return trajs[0][-1]
     #return trajs
 
+def sample_motif_ar(matrix, mu, Ne, N):
+    L = len(matrix)
+    ep_min = sum(map(min, matrix))
+    nu = Ne - 1
+    des_ep = max(mu - log(nu), ep_min + 1)
+    def f(lamb):
+        psfm = psfm_from_matrix(matrix, lamb)
+        return sum((sum(ep*p for ep, p in zip(eps,ps)) for (eps, ps) in zip(matrix, psfm))) - des_ep
+    lamb = bisect_interval(f,-20,20)
+    return [sample_site_ar(matrix, mu, Ne, lamb=lamb) for i in range(N)]
+    
+def sample_site_ar(matrix, mu, Ne, lamb=None):
+    L = len(matrix)
+    nu = Ne - 1
+    des_ep = mu - log(nu)
+    if lamb is None:
+        def f(lamb):
+            psfm = psfm_from_matrix(matrix, lamb)
+            return sum((sum(ep*p for ep, p in zip(eps,ps)) for (eps, ps) in zip(matrix, psfm))) - des_ep
+        lamb = bisect_interval(f,-20,20)
+    psfm = psfm_from_matrix(matrix, lamb)
+    log_psfm = [map(log,row) for row in psfm]
+    def log_P(site):
+        ep = score_seq(matrix, site)
+        return -nu * log(1+exp(ep-mu))
+    while True:
+        site = sample_from_psfm(psfm)
+        log_ar = log_P(site) + -L*log(4) - score_seq(log_psfm, site)
+        if log(random.random()) < log_ar:
+            return site
+            
+def sample_motif_rocftp(matrix, mu, Ne, N, block_length=None):
+    L = len(matrix)
+    f = seq_scorer(matrix)
+    if block_length is None:
+        block_length = 10 * L
+    def log_phat(s):
+        ep = f(s)
+        nu = Ne - 1
+        return -nu*log(1 + exp(ep - mu))
+    best_site = "".join(["ACGT"[argmin(row)] for row in matrix])
+    worst_site = "".join(["ACGT"[argmax(row)] for row in matrix])
+    ords = [rslice("ACGT",sorted_indices(row)) for row in matrix]
+    #middle_sites  = [[random_site(L)] for i in range(10)]
+    #trajs = [[best_site]] + middle_sites + [[worst_site]]
+    def mutate_site(site,(ri,direction)):
+        b = (site[ri])
+        idx = ords[ri].index(b)
+        idxp = min(max(idx + direction,0),3)
+        bp = ords[ri][idxp]
+        return subst(site,bp,ri)
+    iterations = 1
+    trajs = [[best_site],[worst_site]]
+    def rr():
+        return (random.randrange(L),random.choice([-1,1]),random.random())
+    converged = False
+    sites = []
+    sample = None
+    last_sample = None
+    while len(sites) < N:
+        #print len(sites)
+        if sample is None:
+            trajs = [best_site, worst_site]
+        else:
+            trajs = [best_site, worst_site, sample]
+        for t in xrange(block_length):
+            ri, rdir, r = rr()
+            for i, x in enumerate(trajs):
+                xp = mutate_site(x,(ri, rdir))
+                if log(r) < log_phat(xp) - log_phat(x):
+                    x = xp
+                trajs[i] = x
+        if trajs[0] == trajs[1]:
+            if not sample is None:
+                sites.append(last_sample)
+            else:
+                sample = trajs[0]
+                trajs.append(sample)
+        last_sample = trajs[2] if len(trajs) == 3 else None
+        #print "last sample:", last_sample
+        #print iterations,[traj[-1] for traj in trajs]
+    return sites
+    #return trajs
+
 
 def spoof_motif_cftp(motif, num_motifs=10, trials=1, sigma=None,Ne_tol=10**-2,verbose=False):
     n = len(motif)
