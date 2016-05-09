@@ -72,8 +72,6 @@ def maxent_motifs(N, L, desired_ic, num_motifs, tolerance=10**-10, A=4, beta=Non
         beta = find_beta_for_mean_motif_ic(N,L,desired_ic,tolerance=tolerance,verbose=verbose, A=A,
                                            countses=countses, entropies=entropies, log_cols=log_cols)
         logger("beta: %s" % beta, verbose)
-    if verbose:
-        print
     logger("computing count ps from beta", verbose)
     ps = count_ps_from_beta(N,beta, A=A, verbose=verbose,
                             log_cols=log_cols, entropies=entropies)
