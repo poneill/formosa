@@ -64,7 +64,7 @@ def uniform_motifs(N,L,desired_ic,num_motifs,epsilon=0.1,beta=None,verbose=False
 def spoof_uniform_motifs(motif, num_motifs, epsilon=0.1,verbose=False):
     N, L = len(motif), len(motif[0])
     desired_ic = motif_ic(motif)
-    if verbose: print "starting spoof motifs uniform with:",n,L,desired_ic
+    if verbose: print "starting spoof motifs uniform with:",N, L, desired_ic
     return uniform_motifs(N, L, desired_ic, num_motifs, epsilon, verbose=verbose)
 
 def spoof_uniform_motif(motif, epsilon=0.1, verbose=False):
