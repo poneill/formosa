@@ -46,12 +46,12 @@ def spoof_maxent_motif(motif,verbose=False, A=4):
     return maxent_motif(N,L,des_ic,verbose=verbose, A=A)
 
 def spoof_maxent_motifs(motif,num_motifs,verbose=False, A=4):
-    n = len(motif)
+    N = len(motif)
     L = len(motif[0])
     des_ic = motif_ic(motif, A=A)
     if verbose:
-        print "n: {} L: {} des_ic: {}".format(n,L,des_ic)
-    return maxent_motifs(n,L,des_ic,num_motifs,verbose=verbose, A=A)
+        print "N: {} L: {} des_ic: {}".format(N,L,des_ic)
+    return maxent_motifs(N,L,des_ic,num_motifs,verbose=verbose, A=A)
 
 def maxent_motifs(N, L, desired_ic, num_motifs, tolerance=10**-10, A=4, beta=None, countses=None,
                   entropies=None, log_cols=None, verbose=False):
@@ -177,7 +177,7 @@ def partitionfunc(n,k,l=1):
             yield (i,)+result
 
 def count_ps_from_beta(N, beta, verbose=False, A=4, log_cols=None, entropies=None):
-    iterator = lambda x:tqdm(x, total=partitions(N, A)) if verbose else lambda x:x
+    iterator = (lambda x:tqdm(x, total=partitions(N, A))) if verbose else (lambda x:x)
     if log_cols is None or entropies is None:
         log_ws = np.array([log_counts_to_cols(count, A=A) + (-beta*entropy_from_counts(count))
                            for count in iterator(enumerate_counts_iter(N, A=A))])
