@@ -87,7 +87,7 @@ def maxent_motifs(N, L, desired_ic, num_motifs, tolerance=10**-10, A=4, beta=Non
     
 def find_beta_for_mean_motif_ic(n,L,desired_ic,tolerance=10**-10,verbose=False, A=4,
                                 countses=None, entropies=None, log_cols=None):
-    desired_ic_per_col = desired_ic/L
+    desired_ic_per_col = desired_ic/float(L)
     return find_beta_for_mean_col_ic(n,desired_ic_per_col,tolerance,verbose=verbose, A=A,
                                      countses=countses, entropies=entropies, log_cols=log_cols)
 
